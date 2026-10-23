@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#022c22" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <!-- Background with rounded squircles -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  
+  <!-- Subtle circular glow -->
+  <circle cx="256" cy="180" r="160" fill="#34d399" opacity="0.18" />
+
+  <!-- Isometric Package / Fardo / Box -->
+  <g filter="url(#shadow)" transform="translate(256, 250)">
+    <!-- Top Face -->
+    <path d="M0 -90 L120 -30 L0 30 L-120 -30 Z" fill="#ffffff" />
+    <!-- Tape / Ribbon on Top -->
+    <path d="M-24 -78 L0 -66 L24 -78 L0 -90 Z" fill="#10b981" opacity="0.7" />
+    <path d="M-30 -15 L30 -45 L30 -25 L-30 05 Z" fill="#10b981" opacity="0.6" />
+    <!-- Left Face -->
+    <path d="M-120 -30 L0 30 L0 120 L-120 60 Z" fill="#e2e8f0" />
+    <!-- Right Face -->
+    <path d="M0 30 L120 -30 L120 60 L0 120 Z" fill="#cbd5e1" />
+
+    <!-- Percentage & Arrow Badge -->
+    <circle cx="50" cy="50" r="46" fill="#059669" stroke="#ffffff" stroke-width="6" />
+    <text x="50" y="58" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="34" fill="#ffffff" text-anchor="middle">%</text>
+    <path d="M-50 25 L-30 -5 L-30 40 L-70 40 L-70 15 Z" fill="#047857" opacity="0.15" />
+    <text x="-60" y="65" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="28" fill="#047857">R$</text>
+  </g>
+</svg>
