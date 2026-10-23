@@ -8,7 +8,7 @@
  *
  * Variáveis de ambiente (veja .env.example):
  *   APP_PASSWORD            senha de acesso ao app
- *   BLOB_READ_WRITE_TOKEN   criada pela Vercel ao conectar o Blob store ao projeto
+ *   BLOB_STORE_ID           identificador do Blob; autenticação OIDC gerenciada pela Vercel
  */
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { get, put } from '@vercel/blob';
@@ -77,7 +77,7 @@ function storageError(error: unknown, action: string): HttpError {
   if (/token|store id|credential|unauthori[sz]ed|forbidden/i.test(detail)) {
     return new HttpError(
       500,
-      'O armazenamento não está configurado. Crie um Blob store (acesso Private) no painel da Vercel e conecte-o ao projeto (variável BLOB_READ_WRITE_TOKEN).'
+      'O armazenamento não está configurado. Crie um Blob store (acesso Private) no painel da Vercel e conecte-o ao projeto para configurar BLOB_STORE_ID e a autenticação OIDC.'
     );
   }
   return new HttpError(502, `Falha ao ${action}: ${detail}`);

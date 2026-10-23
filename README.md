@@ -21,8 +21,8 @@ Navegador (React + cache local)  ──►  /api/db (Vercel)  ──►  Vercel 
 3. Em **Environment Variables**, cadastre `APP_PASSWORD` com a senha que vocês dois vão usar. Clique em **Deploy**.
 4. No projeto, abra a aba **Storage** → **Create Storage** → **Blob** → escolha o acesso **Private** →
    crie o store e conecte ao projeto (deixe Production e Preview marcados; marque Development se for rodar local).
-   A Vercel cria sozinha a variável `BLOB_READ_WRITE_TOKEN`.
-5. Faça um novo deploy (**Deployments → ⋯ → Redeploy**) para o app enxergar a variável.
+   A conexão configura `BLOB_STORE_ID`; a autenticação OIDC é gerenciada pela Vercel e usada automaticamente pelo SDK.
+5. Faça um novo deploy (**Deployments → ⋯ → Redeploy**) para aplicar as variáveis ao app.
 6. Abra a URL, digite a senha e pronto. No primeiro acesso o arquivo é criado com o catálogo inicial de 46 produtos.
 
 > O store precisa ser **Private**. Com store público a gravação falha.
@@ -31,18 +31,20 @@ Navegador (React + cache local)  ──►  /api/db (Vercel)  ──►  Vercel 
 
 ```bash
 npm install                      # gera o package-lock.json (faça commit dele)
-cp .env.example .env.local       # preencha APP_PASSWORD e BLOB_READ_WRITE_TOKEN
+vercel link                      # conecte a pasta local ao projeto, se ainda não estiver vinculada
+vercel env pull .env.local       # puxe as variáveis; habilite Development na conexão do Blob
 npm run dev                      # http://localhost:3000 (a rota /api/db também funciona aqui)
 ```
 
-O token do Blob aparece no painel do store (aba `.env.local`) ou com `vercel env pull .env.local`.
+Configure `APP_PASSWORD` também no ambiente Development da Vercel antes de puxar as variáveis.
+O SDK do Blob usa a autenticação OIDC obtida pela Vercel; não copie nem compartilhe tokens.
 Atenção: rodando local você mexe nos **mesmos dados** de produção.
 
 ## Problemas comuns
 
 | Mensagem no app | O que fazer |
 | --- | --- |
-| "O armazenamento não está configurado…" | Falta criar/conectar o Blob store (passo 4) ou fazer o redeploy (passo 5). |
+| "O armazenamento não está configurado…" | Falta conectar o Blob store ao projeto (passo 4) ou fazer o redeploy (passo 5). |
 | "Falha ao gravar os dados: …access…" | O Blob store foi criado como Public. Crie outro como **Private**. |
 | "A variável APP_PASSWORD não está configurada" | Cadastre a variável na Vercel e faça um novo deploy. |
 | "Senha incorreta." | A senha digitada não é a do `APP_PASSWORD`. |
