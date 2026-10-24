@@ -22,7 +22,6 @@ import { ProductTableTab } from './components/ProductTableTab';
 import { OrderSimulatorTab } from './components/OrderSimulatorTab';
 import { ProductModal } from './components/ProductModal';
 import { SettingsModal } from './components/SettingsModal';
-import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { CloudSyncBar } from './components/CloudSyncBar';
 import { LoginGate } from './components/LoginGate';
 import { InstallModal } from './components/InstallModal';
@@ -136,7 +135,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans lg:bg-slate-50">
       {/* PWA Install Banner */}
-      <PWAInstallBanner />
+      
 
       {/* Top Header */}
       <Header
