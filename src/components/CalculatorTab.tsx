@@ -188,9 +188,9 @@ export const CalculatorTab: React.FC<CalculatorTabProps> = ({
   };
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-20 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0 lg:pb-8">
       {/* Top Banner / Quick Selector */}
-      <div className="bg-white rounded-2xl p-4 shadow-xs border border-orange-100">
+      <div className="bg-white rounded-2xl p-4 shadow-xs border border-orange-100 lg:col-span-2 lg:p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-orange-100 text-orange-800 flex items-center justify-center font-bold">
@@ -263,7 +263,7 @@ export const CalculatorTab: React.FC<CalculatorTabProps> = ({
       </div>
 
       {/* Main Inputs Form */}
-      <div className="bg-white rounded-2xl p-4 shadow-xs border border-orange-100/80 space-y-3.5">
+      <div className="bg-white rounded-2xl p-4 shadow-xs border border-orange-100/80 space-y-3.5 lg:p-5">
         {/* Row 1: Product Name & Code */}
         <div className="grid grid-cols-3 gap-2">
           <div className="col-span-2">
@@ -496,7 +496,7 @@ export const CalculatorTab: React.FC<CalculatorTabProps> = ({
       </div>
 
       {/* RESULT CARDS IN MODERN VIBRANT ORANGE */}
-      <div className="space-y-3">
+      <div className="space-y-3 lg:sticky lg:top-40">
         {/* Main Card: Valor do Fardo/Caixa */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 text-white p-5 shadow-lg border border-orange-400/30">
           <div className="absolute right-3 top-3 opacity-10 pointer-events-none">

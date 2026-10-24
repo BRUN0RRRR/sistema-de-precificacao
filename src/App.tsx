@@ -116,11 +116,11 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans lg:bg-slate-50">
       {/* PWA Install Banner */}
       <PWAInstallBanner />
 
-      {/* Mobile Top Header */}
+      {/* Top Header */}
       <Header
         settings={settings}
         productCount={products.length}
@@ -129,8 +129,14 @@ export default function App() {
         onOpenInstall={() => setIsInstallModalOpen(true)}
       />
 
+      <BottomNav
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
+        productCount={products.length}
+      />
+
       {/* Main Content Area */}
-      <main className="flex-1 max-w-2xl w-full mx-auto p-3.5 sm:p-4">
+      <main className="flex-1 max-w-2xl w-full mx-auto p-3.5 sm:p-4 lg:max-w-7xl lg:px-8 lg:pt-6 lg:pb-10">
         {/* Banco de dados na nuvem */}
         <CloudSyncBar
           status={sync.status}
@@ -167,13 +173,6 @@ export default function App() {
           />
         )}
       </main>
-
-      {/* Android Bottom Navigation */}
-      <BottomNav
-        activeTab={activeTab}
-        onChangeTab={setActiveTab}
-        productCount={products.length}
-      />
 
       {/* Product Add / Edit Modal */}
       <ProductModal

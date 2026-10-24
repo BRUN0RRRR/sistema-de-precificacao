@@ -18,18 +18,18 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenInstall,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-orange-100 px-4 py-3 shadow-2xs">
-      <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-orange-100 px-4 py-3 shadow-2xs lg:px-8 lg:py-3.5">
+      <div className="max-w-2xl mx-auto flex items-center justify-between gap-3 lg:max-w-7xl lg:px-4">
         {/* Brand / Logo */}
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white flex items-center justify-center shadow-xs shrink-0">
             <Package className="w-5 h-5 text-white" />
           </div>
           <div className="truncate">
-            <h1 className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight truncate flex items-center gap-1.5">
+            <h1 className="font-extrabold text-slate-900 text-sm sm:text-base lg:text-lg tracking-tight truncate flex items-center gap-1.5">
               <span>Calculo de produtos</span>
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium truncate flex items-center gap-1">
+            <p className="text-[11px] lg:text-xs text-slate-500 font-medium truncate flex items-center gap-1">
               <span>{settings.companyName || 'Atacado & Distribuição'}</span>
               <span aria-hidden="true">·</span>
               <span>{productCount} itens cadastrados</span>

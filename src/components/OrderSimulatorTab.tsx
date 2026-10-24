@@ -11,7 +11,9 @@ import {
   Share2,
   Receipt,
   RotateCcw,
+  FileText,
 } from 'lucide-react';
+import { ReceiptModal } from './ReceiptModal';
 
 interface OrderSimulatorTabProps {
   products: Product[];
@@ -20,10 +22,12 @@ interface OrderSimulatorTabProps {
 
 export const OrderSimulatorTab: React.FC<OrderSimulatorTabProps> = ({
   products,
+  settings,
 }) => {
   // Map of productId -> quantity of fardos/boxes
   const [cart, setCart] = useState<Record<string, number>>({});
   const [clientName, setClientName] = useState('');
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
 
   const updateQuantity = (productId: string, delta: number) => {
     setCart((prev) => {
@@ -115,9 +119,9 @@ export const OrderSimulatorTab: React.FC<OrderSimulatorTabProps> = ({
   };
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-20 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0 lg:pb-8">
       {/* Top Card */}
-      <div className="bg-white rounded-2xl p-4 shadow-xs border border-orange-100">
+      <div className="bg-white rounded-2xl p-4 shadow-xs border border-orange-100 lg:col-span-2 lg:p-5">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-orange-100 text-orange-800 flex items-center justify-center font-bold">
@@ -230,6 +234,13 @@ export const OrderSimulatorTab: React.FC<OrderSimulatorTabProps> = ({
             <Share2 className="w-4 h-4" />
             <span>Enviar Pedido pelo WhatsApp</span>
           </button>
+          <button
+            onClick={() => setIsReceiptOpen(true)}
+            className="w-full bg-orange-100 hover:bg-orange-200 text-orange-900 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer text-sm"
+          >
+            <FileText className="w-4 h-4" />
+            <span>Gerar Recibo em PDF</span>
+          </button>
         </div>
       )}
 
@@ -317,6 +328,23 @@ export const OrderSimulatorTab: React.FC<OrderSimulatorTabProps> = ({
           })}
         </div>
       </div>
+
+      {isReceiptOpen && (
+        <ReceiptModal
+          items={items.map((item) => ({
+            code: item.product.cod,
+            name: item.product.name,
+            quantity: item.qty,
+            unitType: item.product.unitType,
+            unitPrice: item.calc.fardoClientPrice,
+            total: item.totalSale,
+          }))}
+          total={totalSale}
+          clientName={clientName}
+          settings={settings}
+          onClose={() => setIsReceiptOpen(false)}
+        />
+      )}
     </div>
   );
 };
