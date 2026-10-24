@@ -1,18 +1,20 @@
 import React from 'react';
-import { Calculator, FileSpreadsheet, ShoppingCart } from 'lucide-react';
+import { Calculator, FileSpreadsheet, ShoppingCart, Users } from 'lucide-react';
 
-export type ActiveTab = 'calculator' | 'table' | 'order' | 'settings';
+export type ActiveTab = 'calculator' | 'table' | 'order' | 'customers' | 'settings';
 
 interface BottomNavProps {
   activeTab: ActiveTab;
   onChangeTab: (tab: ActiveTab) => void;
   productCount: number;
+  customerCount: number;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
   activeTab,
   onChangeTab,
   productCount,
+  customerCount,
 }) => {
   const tabs = [
     {
@@ -33,11 +35,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       icon: ShoppingCart,
       badge: null,
     },
+    {
+      id: 'customers' as ActiveTab,
+      label: 'Clientes',
+      icon: Users,
+      badge: customerCount,
+    },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-orange-100 py-1.5 px-3 shadow-lg max-w-2xl mx-auto pb-safe lg:sticky lg:top-[68px] lg:bottom-auto lg:max-w-7xl lg:w-full lg:bg-transparent lg:backdrop-blur-0 lg:border-0 lg:px-4 lg:py-0 lg:shadow-none">
-      <div className="grid grid-cols-3 gap-1 lg:flex lg:justify-start lg:gap-2 lg:rounded-b-2xl lg:border-x lg:border-b lg:border-orange-100 lg:bg-white lg:px-4 lg:py-2 lg:shadow-sm">
+      <div className="grid grid-cols-4 gap-1 lg:flex lg:justify-start lg:gap-2 lg:rounded-b-2xl lg:border-x lg:border-b lg:border-orange-100 lg:bg-white lg:px-4 lg:py-2 lg:shadow-sm">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

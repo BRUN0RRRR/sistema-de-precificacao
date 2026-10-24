@@ -3,8 +3,8 @@
  *
  * O banco é um único arquivo JSON num Vercel Blob privado (precificafardo-db.json).
  *
- *   GET  /api/db  -> { data: { version, savedAt, products, settings } | null }
- *   PUT  /api/db  -> grava { products, settings } e responde { savedAt }
+ *   GET  /api/db  -> { data: { version, savedAt, products, settings, customers } | null }
+ *   PUT  /api/db  -> grava produtos, configurações e clientes e responde { savedAt }
  *
  * Variáveis de ambiente (veja .env.example):
  *   APP_PASSWORD            senha de acesso ao app
@@ -35,6 +35,7 @@ class HttpError extends Error {
 
 const MAX_PAYLOAD_BYTES = 2_000_000;
 const MAX_PRODUCTS = 5000;
+const MAX_CUSTOMERS = 10000;
 
 /* ---------------------------------- auth ---------------------------------- */
 
@@ -70,6 +71,7 @@ interface StoredDb {
   savedAt: number;
   products: unknown[];
   settings: Record<string, unknown>;
+  customers?: unknown[];
 }
 
 function storageError(error: unknown, action: string): HttpError {
@@ -110,6 +112,7 @@ async function readDb(): Promise<StoredDb | null> {
     savedAt: typeof db.savedAt === 'number' ? db.savedAt : 0,
     products: db.products,
     settings: db.settings && typeof db.settings === 'object' ? db.settings : {},
+    customers: Array.isArray(db.customers) ? db.customers : [],
   };
 }
 
@@ -157,12 +160,20 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       if (body.products.length > MAX_PRODUCTS) {
         throw new HttpError(400, `Limite de ${MAX_PRODUCTS} produtos excedido.`);
       }
+      if (body.customers !== undefined && !Array.isArray(body.customers)) {
+        throw new HttpError(400, 'Dados inválidos: customers deve ser uma lista.');
+      }
+      if (Array.isArray(body.customers) && body.customers.length > MAX_CUSTOMERS) {
+        throw new HttpError(400, `Limite de ${MAX_CUSTOMERS} clientes excedido.`);
+      }
 
+      const existingDb = body.customers === undefined ? await readDb() : null;
       const db: StoredDb = {
         version: 1,
         savedAt: Date.now(),
         products: body.products,
         settings: body.settings && typeof body.settings === 'object' ? (body.settings as Record<string, unknown>) : {},
+        customers: Array.isArray(body.customers) ? body.customers : existingDb?.customers ?? [],
       };
       if (Buffer.byteLength(JSON.stringify(db)) > MAX_PAYLOAD_BYTES) {
         throw new HttpError(413, 'Dados grandes demais.');

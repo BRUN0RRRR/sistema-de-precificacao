@@ -1,4 +1,4 @@
-import type { GlobalSettings, Product } from '../types/pricing';
+import type { Customer, GlobalSettings, Product } from '../types/pricing';
 
 const PASSWORD_KEY = 'calculo_produtos_app_password_v1';
 
@@ -16,6 +16,7 @@ export interface RemoteDb {
   savedAt: number;
   products: Product[];
   settings: Partial<GlobalSettings>;
+  customers?: Customer[];
 }
 
 export function getStoredPassword(): string | null {
@@ -72,7 +73,7 @@ export async function fetchDb(): Promise<{ data: RemoteDb | null }> {
 }
 
 export async function saveDb(
-  payload: { products: Product[]; settings: GlobalSettings },
+  payload: { products: Product[]; settings: GlobalSettings; customers?: Customer[] },
   keepalive = false
 ): Promise<{ savedAt: number }> {
   return request('PUT', payload, keepalive);

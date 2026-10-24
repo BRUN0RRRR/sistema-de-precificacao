@@ -1,10 +1,11 @@
-import { Product, GlobalSettings } from '../types/pricing';
+import { Customer, Product, GlobalSettings } from '../types/pricing';
 import { INITIAL_PRODUCTS, DEFAULT_SETTINGS } from './pricing';
 
 // Cache local: abre o app na hora e serve de apoio sem internet.
 // A fonte da verdade é o arquivo JSON na nuvem (via /api/db).
 const PRODUCTS_STORAGE_KEY = 'calculo_produtos_list_v2';
 const SETTINGS_STORAGE_KEY = 'calculo_produtos_settings_v2';
+const CUSTOMERS_STORAGE_KEY = 'calculo_produtos_customers_v1';
 
 export function loadStoredProducts(): Product[] {
   try {
@@ -45,6 +46,26 @@ export function saveStoredSettings(settings: GlobalSettings): void {
   }
 }
 
+export function loadStoredCustomers(): Customer[] {
+  try {
+    const raw = localStorage.getItem(CUSTOMERS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('Erro ao carregar clientes do localStorage:', error);
+    return [];
+  }
+}
+
+export function saveStoredCustomers(customers: Customer[]): void {
+  try {
+    localStorage.setItem(CUSTOMERS_STORAGE_KEY, JSON.stringify(customers));
+  } catch (error) {
+    console.error('Erro ao salvar clientes no localStorage:', error);
+  }
+}
+
 export function resetToInitialProducts(): Product[] {
   try {
     localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(INITIAL_PRODUCTS));
@@ -58,6 +79,7 @@ export function clearLocalCache(): void {
   try {
     localStorage.removeItem(PRODUCTS_STORAGE_KEY);
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    localStorage.removeItem(CUSTOMERS_STORAGE_KEY);
   } catch {
     /* ignora */
   }

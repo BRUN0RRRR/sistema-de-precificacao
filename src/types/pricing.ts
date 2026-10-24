@@ -33,6 +33,25 @@ export interface OrderItem {
   fardosQuantity: number;
 }
 
+export interface Customer {
+  id: string;
+  name: string;
+  cnpj: string;
+  stateRegistration: string;
+  zipCode: string;
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  responsibleName: string;
+  responsiblePhone: string;
+  companyPhone: string;
+  email: string;
+  updatedAt: number;
+}
+
 export interface GlobalSettings {
   defaultMarginPercent: number; // Margem padrão do atacado (ex: 50% = 1.5x)
   defaultClientMarginPercent: number; // Margem padrão da sugestão consumidor (ex: 40% = 1.4x)

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { GlobalSettings, Product } from '../types/pricing';
+import type { Customer, GlobalSettings, Product } from '../types/pricing';
 import { DEFAULT_SETTINGS } from '../utils/pricing';
 import { clearLocalCache } from '../utils/storage';
 import {
@@ -17,6 +17,7 @@ export type SyncStatus = 'login' | 'loading' | 'saving' | 'saved' | 'offline' | 
 interface Snapshot {
   products: Product[];
   settings: GlobalSettings;
+  customers: Customer[];
 }
 
 interface Options extends Snapshot {
@@ -26,28 +27,30 @@ interface Options extends Snapshot {
 const AUTO_SAVE_DELAY_MS = 1000;
 const BACKGROUND_REFRESH_MS = 30_000;
 
-const serialize = (products: Product[], settings: GlobalSettings) => JSON.stringify({ products, settings });
+const serialize = (products: Product[], settings: GlobalSettings, customers: Customer[]) =>
+  JSON.stringify({ products, settings, customers });
 
 function normalize(remote: RemoteDb): Snapshot {
   return {
     products: Array.isArray(remote.products) ? remote.products : [],
     settings: { ...DEFAULT_SETTINGS, ...(remote.settings || {}) },
+    customers: Array.isArray(remote.customers) ? remote.customers : [],
   };
 }
 
 /**
- * Mantém produtos + configurações sincronizados com o arquivo JSON na nuvem
+ * Mantém produtos, configurações e clientes sincronizados com o arquivo JSON na nuvem
  * (via /api/db): carrega ao abrir, salva sozinho após editar e atualiza ao
  * voltar para o app. Última gravação vence.
  */
-export function useCloudSync({ products, settings, onRemoteData }: Options) {
+export function useCloudSync({ products, settings, customers, onRemoteData }: Options) {
   const [status, setStatus] = useState<SyncStatus>(getStoredPassword() ? 'loading' : 'login');
   const [message, setMessage] = useState<string | null>(null);
   const [lastSyncAt, setLastSyncAt] = useState<number | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const latest = useRef<Snapshot>({ products, settings });
-  latest.current = { products, settings };
+  const latest = useRef<Snapshot>({ products, settings, customers });
+  latest.current = { products, settings, customers };
 
   const onRemoteRef = useRef(onRemoteData);
   onRemoteRef.current = onRemoteData;
@@ -59,9 +62,10 @@ export function useCloudSync({ products, settings, onRemoteData }: Options) {
   const saving = useRef(false);
   const pendingSave = useRef(false);
   const touchedBeforeLoad = useRef(false);
-  const initialJson = useRef(serialize(products, settings));
+  const initialJson = useRef(serialize(products, settings, customers));
 
-  const hasUnsavedChanges = () => serialize(latest.current.products, latest.current.settings) !== lastSavedJson.current;
+  const hasUnsavedChanges = () =>
+    serialize(latest.current.products, latest.current.settings, latest.current.customers) !== lastSavedJson.current;
 
   const handleError = useCallback((error: unknown, silent = false) => {
     if (error instanceof ApiError && error.status === 401) {
@@ -90,13 +94,14 @@ export function useCloudSync({ products, settings, onRemoteData }: Options) {
       }
 
       const { products: prods, settings: sets } = latest.current;
-      const json = serialize(prods, sets);
+      const { customers: clientList } = latest.current;
+      const json = serialize(prods, sets, clientList);
       if (json === lastSavedJson.current) return;
 
       saving.current = true;
       setStatus('saving');
       try {
-        const result = await saveDb({ products: prods, settings: sets }, keepalive);
+        const result = await saveDb({ products: prods, settings: sets, customers: clientList }, keepalive);
         lastSavedJson.current = json;
         remoteSavedAt.current = result.savedAt;
         setLastSyncAt(Date.now());
@@ -157,7 +162,7 @@ export function useCloudSync({ products, settings, onRemoteData }: Options) {
           }
         }
 
-        lastSavedJson.current = serialize(remote.products, remote.settings);
+        lastSavedJson.current = serialize(remote.products, remote.settings, remote.customers);
         remoteSavedAt.current = data.savedAt;
         onRemoteRef.current(remote);
         hydrated.current = true;
@@ -183,18 +188,18 @@ export function useCloudSync({ products, settings, onRemoteData }: Options) {
 
   // Alterações feitas antes de a nuvem responder não podem ser perdidas em silêncio.
   useEffect(() => {
-    if (!hydrated.current && serialize(products, settings) !== initialJson.current) {
+    if (!hydrated.current && serialize(products, settings, customers) !== initialJson.current) {
       touchedBeforeLoad.current = true;
     }
-  }, [products, settings]);
+  }, [products, settings, customers]);
 
   // Salva sozinho, 1s depois da última edição.
   useEffect(() => {
     if (!hydrated.current) return;
-    if (serialize(products, settings) === lastSavedJson.current) return;
+    if (serialize(products, settings, customers) === lastSavedJson.current) return;
     const timer = setTimeout(() => void save(), AUTO_SAVE_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [products, settings, save]);
+  }, [products, settings, customers, save]);
 
   // Ao sair do app, envia o que faltar; ao voltar, busca mudanças de outros aparelhos.
   useEffect(() => {

@@ -4,13 +4,15 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Product, GlobalSettings } from './types/pricing';
+import { Customer, Product, GlobalSettings } from './types/pricing';
 import {
   loadStoredProducts,
   saveStoredProducts,
   loadStoredSettings,
   saveStoredSettings,
   resetToInitialProducts,
+  loadStoredCustomers,
+  saveStoredCustomers,
 } from './utils/storage';
 import { useCloudSync } from './hooks/useCloudSync';
 import { Header } from './components/Header';
@@ -24,11 +26,13 @@ import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { CloudSyncBar } from './components/CloudSyncBar';
 import { LoginGate } from './components/LoginGate';
 import { InstallModal } from './components/InstallModal';
+import { CustomersTab } from './components/CustomersTab';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('calculator');
   const [products, setProducts] = useState<Product[]>(() => loadStoredProducts());
   const [settings, setSettings] = useState<GlobalSettings>(() => loadStoredSettings());
+  const [customers, setCustomers] = useState<Customer[]>(() => loadStoredCustomers());
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -39,9 +43,11 @@ export default function App() {
   const sync = useCloudSync({
     products,
     settings,
+    customers,
     onRemoteData: (remote) => {
       setProducts(remote.products);
       setSettings(remote.settings);
+      setCustomers(remote.customers);
     },
   });
 
@@ -53,6 +59,10 @@ export default function App() {
   useEffect(() => {
     saveStoredSettings(settings);
   }, [settings]);
+
+  useEffect(() => {
+    saveStoredCustomers(customers);
+  }, [customers]);
 
   // Product actions
   const handleSaveProduct = (product: Product) => {
@@ -111,6 +121,14 @@ export default function App() {
     setProducts(imported);
   };
 
+  const handleSaveCustomer = (customer: Customer) => {
+    setCustomers((current) => {
+      const existingIndex = current.findIndex((item) => item.id === customer.id);
+      if (existingIndex < 0) return [customer, ...current];
+      return current.map((item) => item.id === customer.id ? customer : item);
+    });
+  };
+
   if (sync.status === 'login' || sync.loggingIn) {
     return <LoginGate message={sync.message} isLoading={sync.loggingIn} onLogin={sync.login} />;
   }
@@ -133,6 +151,7 @@ export default function App() {
         activeTab={activeTab}
         onChangeTab={setActiveTab}
         productCount={products.length}
+        customerCount={customers.length}
       />
 
       {/* Main Content Area */}
@@ -170,6 +189,15 @@ export default function App() {
           <OrderSimulatorTab
             products={products}
             settings={settings}
+            customers={customers}
+          />
+        )}
+
+        {activeTab === 'customers' && (
+          <CustomersTab
+            customers={customers}
+            onSaveCustomer={handleSaveCustomer}
+            onDeleteCustomer={(id) => setCustomers((current) => current.filter((customer) => customer.id !== id))}
           />
         )}
       </main>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Product, GlobalSettings } from '../types/pricing';
+import { Customer, Product, GlobalSettings } from '../types/pricing';
 import {
   calculatePricing,
   formatCurrency,
@@ -18,11 +18,13 @@ import { ReceiptModal } from './ReceiptModal';
 interface OrderSimulatorTabProps {
   products: Product[];
   settings: GlobalSettings;
+  customers: Customer[];
 }
 
 export const OrderSimulatorTab: React.FC<OrderSimulatorTabProps> = ({
   products,
   settings,
+  customers,
 }) => {
   // Map of productId -> quantity of fardos/boxes
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -149,16 +151,31 @@ export const OrderSimulatorTab: React.FC<OrderSimulatorTabProps> = ({
         </div>
 
         <div className="mt-3">
-          <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
+          <label htmlFor="order-client-name" className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
             Nome do Cliente / Estabelecimento (Opcional)
           </label>
           <input
+            id="order-client-name"
             type="text"
+            list="registered-order-customers"
+            autoComplete="off"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
-            placeholder="Ex: Mercearia do João, Bar da Esquina..."
+            placeholder={customers.length ? 'Digite ou selecione um cliente cadastrado...' : 'Ex: Mercearia do João, Bar da Esquina...'}
             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition"
           />
+          <datalist id="registered-order-customers">
+            {customers.map((customer) => (
+              <option key={customer.id} value={customer.name}>
+                {customer.cnpj}
+              </option>
+            ))}
+          </datalist>
+          {customers.length > 0 && (
+            <p className="mt-1 text-[10px] text-slate-500">
+              Comece a digitar para escolher entre {customers.length} {customers.length === 1 ? 'cliente cadastrado' : 'clientes cadastrados'}.
+            </p>
+          )}
         </div>
       </div>
 
